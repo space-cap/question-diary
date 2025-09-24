@@ -159,4 +159,120 @@ export class ResponseService {
       throw error
     }
   }
+
+  /**
+   * 답변 검색 (내용 기반)
+   */
+  static async searchResponses(
+    searchQuery: string,
+    categoryFilter?: string,
+    moodFilter?: { min?: number; max?: number },
+    dateFilter?: { start?: string; end?: string },
+    limit = 20,
+    offset = 0
+  ): Promise<DailySummary[]> {
+    try {
+      let query = supabase
+        .from('daily_summary')
+        .select('*')
+        .eq('is_completed', true)
+
+      // 텍스트 검색
+      if (searchQuery.trim()) {
+        query = query.or(`response_content.ilike.%${searchQuery}%,question_content.ilike.%${searchQuery}%`)
+      }
+
+      // 카테고리 필터
+      if (categoryFilter) {
+        query = query.eq('category', categoryFilter)
+      }
+
+      // 기분 점수 필터
+      if (moodFilter) {
+        if (moodFilter.min !== undefined) {
+          query = query.gte('mood_rating', moodFilter.min)
+        }
+        if (moodFilter.max !== undefined) {
+          query = query.lte('mood_rating', moodFilter.max)
+        }
+      }
+
+      // 날짜 범위 필터
+      if (dateFilter) {
+        if (dateFilter.start) {
+          query = query.gte('assigned_date', dateFilter.start)
+        }
+        if (dateFilter.end) {
+          query = query.lte('assigned_date', dateFilter.end)
+        }
+      }
+
+      const { data, error } = await query
+        .order('assigned_date', { ascending: false })
+        .range(offset, offset + limit - 1)
+
+      if (error) throw error
+
+      return data || []
+    } catch (error) {
+      console.error('❌ 답변 검색 실패:', error)
+      throw error
+    }
+  }
+
+  /**
+   * 검색 결과 개수
+   */
+  static async getSearchResultCount(
+    searchQuery: string,
+    categoryFilter?: string,
+    moodFilter?: { min?: number; max?: number },
+    dateFilter?: { start?: string; end?: string }
+  ): Promise<number> {
+    try {
+      let query = supabase
+        .from('daily_summary')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_completed', true)
+
+      // 텍스트 검색
+      if (searchQuery.trim()) {
+        query = query.or(`response_content.ilike.%${searchQuery}%,question_content.ilike.%${searchQuery}%`)
+      }
+
+      // 카테고리 필터
+      if (categoryFilter) {
+        query = query.eq('category', categoryFilter)
+      }
+
+      // 기분 점수 필터
+      if (moodFilter) {
+        if (moodFilter.min !== undefined) {
+          query = query.gte('mood_rating', moodFilter.min)
+        }
+        if (moodFilter.max !== undefined) {
+          query = query.lte('mood_rating', moodFilter.max)
+        }
+      }
+
+      // 날짜 범위 필터
+      if (dateFilter) {
+        if (dateFilter.start) {
+          query = query.gte('assigned_date', dateFilter.start)
+        }
+        if (dateFilter.end) {
+          query = query.lte('assigned_date', dateFilter.end)
+        }
+      }
+
+      const { count, error } = await query
+
+      if (error) throw error
+
+      return count || 0
+    } catch (error) {
+      console.error('❌ 검색 결과 개수 조회 실패:', error)
+      throw error
+    }
+  }
 }

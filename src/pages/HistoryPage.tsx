@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import { ResponseService } from '../services/responseService'
 import { ResponseCard } from '../components/ResponseCard'
+import { SearchFilter, type SearchFilters } from '../components/SearchFilter'
 import type { DailySummary } from '../types'
 
 export function HistoryPage() {
@@ -11,6 +12,13 @@ export function HistoryPage() {
   const [currentPage, setCurrentPage] = useState(0)
   const [totalCount, setTotalCount] = useState(0)
   const [hasMore, setHasMore] = useState(true)
+  const [currentFilters, setCurrentFilters] = useState<SearchFilters>({
+    searchQuery: '',
+    categoryFilter: '',
+    moodFilter: {},
+    dateFilter: {}
+  })
+  const [isSearchMode, setIsSearchMode] = useState(false)
 
   const ITEMS_PER_PAGE = 10
 
@@ -52,9 +60,94 @@ export function HistoryPage() {
     }
   }
 
+
+  // 검색 처리
+  const handleSearch = async (filters: SearchFilters) => {
+    try {
+      setLoading(true)
+      setError(null)
+      setCurrentFilters(filters)
+
+      const hasActiveFilters = filters.searchQuery.trim() ||
+                              filters.categoryFilter ||
+                              filters.moodFilter.min !== undefined ||
+                              filters.moodFilter.max !== undefined ||
+                              filters.dateFilter.start ||
+                              filters.dateFilter.end
+
+      setIsSearchMode(hasActiveFilters)
+
+      if (hasActiveFilters) {
+        // 검색 실행
+        const [searchResults, count] = await Promise.all([
+          ResponseService.searchResponses(
+            filters.searchQuery,
+            filters.categoryFilter || undefined,
+            filters.moodFilter,
+            filters.dateFilter,
+            ITEMS_PER_PAGE,
+            0
+          ),
+          ResponseService.getSearchResultCount(
+            filters.searchQuery,
+            filters.categoryFilter || undefined,
+            filters.moodFilter,
+            filters.dateFilter
+          )
+        ])
+
+        setResponses(searchResults)
+        setTotalCount(count)
+        setCurrentPage(0)
+        setHasMore(ITEMS_PER_PAGE < count)
+      } else {
+        // 일반 히스토리 로드
+        loadHistory(0, false)
+      }
+    } catch (error: any) {
+      console.error('검색 실패:', error)
+      setError(error.message || '검색에 실패했습니다.')
+      toast.error('검색에 실패했습니다.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 더 보기 (검색 모드일 때)
+  const loadMoreSearch = async () => {
+    if (!loading && hasMore && isSearchMode) {
+      try {
+        setLoading(true)
+        const nextPage = currentPage + 1
+
+        const moreResults = await ResponseService.searchResponses(
+          currentFilters.searchQuery,
+          currentFilters.categoryFilter || undefined,
+          currentFilters.moodFilter,
+          currentFilters.dateFilter,
+          ITEMS_PER_PAGE,
+          nextPage * ITEMS_PER_PAGE
+        )
+
+        setResponses(prev => [...prev, ...moreResults])
+        setCurrentPage(nextPage)
+        setHasMore((nextPage + 1) * ITEMS_PER_PAGE < totalCount)
+      } catch (error: any) {
+        console.error('더 많은 검색 결과 로드 실패:', error)
+        toast.error('더 많은 결과를 불러오는데 실패했습니다.')
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
+
   const loadMore = () => {
-    if (!loading && hasMore) {
-      loadHistory(currentPage + 1, true)
+    if (isSearchMode) {
+      loadMoreSearch()
+    } else {
+      if (!loading && hasMore) {
+        loadHistory(currentPage + 1, true)
+      }
     }
   }
 
@@ -126,11 +219,18 @@ export function HistoryPage() {
               답변 히스토리
             </h1>
             <p className="text-gray-600">
-              총 <span className="font-semibold text-purple-600 bg-purple-50 px-2 py-1 rounded-lg">{totalCount}개</span>의 소중한 답변을 작성하셨습니다.
+              {isSearchMode ? (
+                <>검색 결과: <span className="font-semibold text-purple-600 bg-purple-50 px-2 py-1 rounded-lg">{totalCount}개</span></>
+              ) : (
+                <>총 <span className="font-semibold text-purple-600 bg-purple-50 px-2 py-1 rounded-lg">{totalCount}개</span>의 소중한 답변을 작성하셨습니다.</>
+              )}
             </p>
           </div>
         </div>
       </div>
+
+      {/* 검색 및 필터 */}
+      <SearchFilter onSearch={handleSearch} loading={loading} />
 
       {/* 답변 카드들 */}
       <div className="space-y-6">

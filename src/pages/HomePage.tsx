@@ -166,16 +166,16 @@ export function HomePage() {
       <div className="mb-8">
         {connectionStatus === 'loading' && (
           <div className="text-center py-8">
-            <div className="inline-flex items-center space-x-3 bg-white/70 backdrop-blur-sm px-6 py-4 rounded-2xl shadow-lg border border-purple-100">
+            <div className="inline-flex items-center space-x-3 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm px-6 py-4 rounded-2xl shadow-lg border border-purple-100 dark:border-gray-600">
               <div className="w-6 h-6 border-3 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
-              <span className="text-purple-700 font-medium">연결 중...</span>
+              <span className="text-purple-700 dark:text-purple-300 font-medium">연결 중...</span>
             </div>
           </div>
         )}
 
         {connectionStatus === 'connected' && (
           <div className="text-center py-4">
-            <div className="inline-flex items-center space-x-2 text-emerald-600 bg-emerald-50/70 backdrop-blur-sm px-4 py-2 rounded-xl">
+            <div className="inline-flex items-center space-x-2 text-emerald-600 dark:text-emerald-400 bg-emerald-50/70 dark:bg-emerald-900/30 backdrop-blur-sm px-4 py-2 rounded-xl">
               <span className="text-lg">✨</span>
               <span className="font-medium">준비 완료!</span>
             </div>
@@ -184,11 +184,11 @@ export function HomePage() {
 
         {connectionStatus === 'error' && (
           <div className="text-center py-8">
-            <div className="inline-flex items-center space-x-3 bg-red-50/70 backdrop-blur-sm px-6 py-4 rounded-2xl shadow-lg border border-red-100">
+            <div className="inline-flex items-center space-x-3 bg-red-50/70 dark:bg-red-900/30 backdrop-blur-sm px-6 py-4 rounded-2xl shadow-lg border border-red-100 dark:border-red-800">
               <span className="text-2xl">⚠️</span>
               <div>
-                <p className="text-red-700 font-medium">연결 실패</p>
-                <p className="text-red-600 text-sm">환경변수를 확인해주세요</p>
+                <p className="text-red-700 dark:text-red-400 font-medium">연결 실패</p>
+                <p className="text-red-600 dark:text-red-300 text-sm">환경변수를 확인해주세요</p>
               </div>
             </div>
           </div>
@@ -197,7 +197,7 @@ export function HomePage() {
 
       {/* 오늘의 질문 표시 */}
       {connectionStatus === 'connected' && todayQuestion && (
-        <div className="bg-white/80 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-white/50 hover:shadow-2xl transition-all duration-300">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-white/50 dark:border-gray-700/50 hover:shadow-2xl transition-all duration-300">
           {/* 헤더 */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
@@ -208,7 +208,7 @@ export function HomePage() {
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                   오늘의 질문
                 </h2>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {new Date(todayQuestion.assigned_date).toLocaleDateString('ko-KR', {
                     year: 'numeric',
                     month: 'long',
@@ -230,38 +230,38 @@ export function HomePage() {
           </div>
 
           {/* 질문 내용 */}
-          <div className="mb-8 p-6 bg-gradient-to-br from-purple-50/50 to-pink-50/50 rounded-2xl border border-purple-100/50">
-            <p className="text-lg text-gray-800 leading-relaxed font-medium">
+          <div className="mb-8 p-6 bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl border border-purple-100/50 dark:border-purple-800/50">
+            <p className="text-lg text-gray-800 dark:text-gray-200 leading-relaxed font-medium">
               {todayQuestion.question_content}
             </p>
           </div>
 
           {/* 답변 섹션 */}
           {todayQuestion.response_content && (
-            <div className="bg-gradient-to-br from-emerald-50/50 to-teal-50/50 p-6 rounded-2xl border border-emerald-100/50">
+            <div className="bg-gradient-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-900/20 dark:to-teal-900/20 p-6 rounded-2xl border border-emerald-100/50 dark:border-emerald-800/50">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center space-x-2">
                   <span className="text-2xl">💭</span>
-                  <h3 className="font-bold text-emerald-700">내 답변</h3>
+                  <h3 className="font-bold text-emerald-700 dark:text-emerald-400">내 답변</h3>
                 </div>
                 <button
                   onClick={() => setIsEditing(true)}
                   disabled={isLoading}
-                  className="group flex items-center space-x-2 px-4 py-2 bg-white/70 hover:bg-white rounded-xl text-purple-600 hover:text-purple-700 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                  className="group flex items-center space-x-2 px-4 py-2 bg-white/70 dark:bg-gray-700/70 hover:bg-white dark:hover:bg-gray-600 rounded-xl text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
                 >
                   <span>✏️</span>
                   <span>수정</span>
                 </button>
               </div>
 
-              <div className="bg-white/60 p-4 rounded-xl mb-4">
-                <p className="text-gray-800 leading-relaxed">{todayQuestion.response_content}</p>
+              <div className="bg-white/60 dark:bg-gray-800/60 p-4 rounded-xl mb-4">
+                <p className="text-gray-800 dark:text-gray-200 leading-relaxed">{todayQuestion.response_content}</p>
               </div>
 
               {todayQuestion.mood_rating && (
                 <div className="flex items-center space-x-3">
                   <span className="text-lg">{getMoodEmoji(todayQuestion.mood_rating)}</span>
-                  <span className="text-emerald-700 font-medium">
+                  <span className="text-emerald-700 dark:text-emerald-400 font-medium">
                     오늘의 기분: {todayQuestion.mood_rating}/10
                   </span>
                 </div>
@@ -271,10 +271,10 @@ export function HomePage() {
 
           {!todayQuestion.response_content && !showAnswerForm && (
             <div className="mt-6 text-center">
-              <p className="text-gray-500 mb-4">아직 답변하지 않았습니다.</p>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">아직 답변하지 않았습니다.</p>
               <button
                 onClick={() => setShowAnswerForm(true)}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-medium"
               >
                 답변 작성하기
               </button>
@@ -311,7 +311,7 @@ export function HomePage() {
       )}
 
       {connectionStatus === 'connected' && !todayQuestion && (
-        <div className="text-center text-gray-500">
+        <div className="text-center text-gray-500 dark:text-gray-400">
           오늘의 질문을 불러올 수 없습니다.
         </div>
       )}
