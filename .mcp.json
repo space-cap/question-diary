@@ -1,0 +1,35 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--project-ref=vruofvecoigopjxgtwbj"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "sbp_25e18ac0f25325283b62cf87528d490da10ae7a1"
+      }
+    },
+    "magic": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@21st-dev/magic@latest"
+      ],
+      "env": {}
+    },
+    "superclaude": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "gemini-superclaude-mcp-server"],
+      "env": {}
+    }
+  }
+}
