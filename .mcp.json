@@ -30,6 +30,14 @@
       "command": "cmd",
       "args": ["/c", "npx", "-y", "gemini-superclaude-mcp-server"],
       "env": {}
+    },
+    "shadcn-ui": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@jpisnice/shadcn-ui-mcp-server"],
+      "env": {
+        "DEBUG": "false"
+      }
     }
   }
 }
