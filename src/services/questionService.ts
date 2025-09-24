@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase'
+import type { Question, DailySummary } from '../types'
 
 /**
  * 오늘의 질문을 가져오는 서비스
@@ -9,7 +10,7 @@ export class QuestionService {
   /**
    * 오늘 날짜의 질문과 답변 정보를 가져옵니다
    */
-  static async getTodayQuestion() {
+  static async getTodayQuestion(): Promise<DailySummary | null> {
     try {
       const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD 형식
 
@@ -38,7 +39,7 @@ export class QuestionService {
   /**
    * 모든 질문 목록을 가져옵니다 (관리용)
    */
-  static async getAllQuestions(limit = 10, offset = 0) {
+  static async getAllQuestions(limit = 10, offset = 0): Promise<Question[]> {
     try {
       const { data, error } = await supabase
         .from('questions')
@@ -48,7 +49,7 @@ export class QuestionService {
         .range(offset, offset + limit - 1)
 
       if (error) throw error
-      return data
+      return data || []
     } catch (error) {
       console.error('❌ 질문 목록 조회 중 오류:', error)
       throw error
@@ -62,7 +63,7 @@ export class QuestionService {
     try {
       console.log('🔍 Supabase 연결 테스트 중...')
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('questions')
         .select('count')
         .limit(1)

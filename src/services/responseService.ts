@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase'
+import type { Response, DailySummary } from '../types'
 
 /**
  * 답변 관리를 위한 서비스
@@ -7,7 +8,7 @@ export class ResponseService {
   /**
    * 새로운 답변을 저장합니다
    */
-  static async saveResponse(questionId: string, content: string, moodRating?: number) {
+  static async saveResponse(questionId: string, content: string, moodRating?: number): Promise<Response> {
     try {
       const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD 형식
 
@@ -45,7 +46,7 @@ export class ResponseService {
   /**
    * 기존 답변을 수정합니다
    */
-  static async updateResponse(responseId: number, content: string, moodRating?: number) {
+  static async updateResponse(responseId: number, content: string, moodRating?: number): Promise<Response> {
     try {
       const responseData = {
         content: content.trim(),
@@ -96,7 +97,7 @@ export class ResponseService {
   /**
    * 특정 날짜의 답변을 조회합니다
    */
-  static async getResponseByDate(date: string) {
+  static async getResponseByDate(date: string): Promise<Response | null> {
     try {
       const { data, error } = await supabase
         .from('responses')
@@ -115,6 +116,46 @@ export class ResponseService {
       return data
     } catch (error) {
       console.error('❌ 답변 조회 실패:', error)
+      throw error
+    }
+  }
+
+  /**
+   * 모든 답변 히스토리를 조회합니다 (페이지네이션 지원)
+   */
+  static async getResponseHistory(limit = 10, offset = 0): Promise<DailySummary[]> {
+    try {
+      const { data, error } = await supabase
+        .from('daily_summary')
+        .select('*')
+        .eq('is_completed', true) // 답변이 있는 것만 조회
+        .order('assigned_date', { ascending: false }) // 최신순
+        .range(offset, offset + limit - 1)
+
+      if (error) throw error
+
+      return data || []
+    } catch (error) {
+      console.error('❌ 답변 히스토리 조회 실패:', error)
+      throw error
+    }
+  }
+
+  /**
+   * 답변 히스토리 총 개수를 조회합니다
+   */
+  static async getResponseHistoryCount(): Promise<number> {
+    try {
+      const { count, error } = await supabase
+        .from('daily_summary')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_completed', true)
+
+      if (error) throw error
+
+      return count || 0
+    } catch (error) {
+      console.error('❌ 답변 히스토리 개수 조회 실패:', error)
       throw error
     }
   }
