@@ -1,10 +1,41 @@
 import { useAuth } from '../contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-hot-toast'
 
 export const DashboardPage = () => {
   const { user, profile, signOut } = useAuth()
+  const navigate = useNavigate()
 
   const handleSignOut = async () => {
-    await signOut()
+    console.log('🚀 로그아웃 버튼이 클릭되었습니다!')
+    try {
+      console.log('📤 signOut 함수 호출 중...')
+      const { error } = await signOut()
+      console.log('📤 signOut 결과:', { error })
+      if (error) {
+        console.error('로그아웃 실패:', error)
+        toast.error('로그아웃에 실패했습니다.')
+      } else {
+        console.log('✅ 로그아웃 성공! 로그인 페이지로 이동합니다.')
+        toast.success('로그아웃되었습니다.')
+        navigate('/auth/login')
+      }
+    } catch (error) {
+      console.error('로그아웃 중 오류:', error)
+      toast.error('로그아웃 중 오류가 발생했습니다.')
+    }
+  }
+
+  const handleGoToQuestions = () => {
+    navigate('/')
+  }
+
+  const handleGoToHistory = () => {
+    navigate('/history')
+  }
+
+  const handleEditProfile = () => {
+    toast.info('프로필 수정 기능은 곧 추가될 예정입니다! 📝')
   }
 
   return (
@@ -84,10 +115,16 @@ export const DashboardPage = () => {
             </div>
 
             <div className="mt-8 space-x-4">
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+              <button
+                onClick={handleGoToQuestions}
+                className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              >
                 오늘의 질문 답하기
               </button>
-              <button className="bg-white text-gray-700 border border-gray-300 px-6 py-2 rounded-md hover:bg-gray-50 transition-colors">
+              <button
+                onClick={handleGoToHistory}
+                className="bg-white text-gray-700 border border-gray-300 px-6 py-2 rounded-md hover:bg-gray-50 transition-colors"
+              >
                 과거 기록 보기
               </button>
             </div>
@@ -127,7 +164,10 @@ export const DashboardPage = () => {
           </div>
 
           <div className="mt-6 pt-4 border-t border-gray-200">
-            <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+            <button
+              onClick={handleEditProfile}
+              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+            >
               프로필 수정하기
             </button>
           </div>

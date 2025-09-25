@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   // 사용자 프로필 가져오기
   const fetchUserProfile = async (userId: string) => {
@@ -103,6 +103,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             setProfile(userProfile)
           }
 
+          // 프로필 가져오기 성공/실패와 상관없이 로딩 완료
           setLoading(false)
         }
       } catch (error) {
@@ -125,19 +126,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setUser(session?.user ?? null)
 
           if (session?.user) {
-            // 새 사용자 등록 시 프로필 생성
-            if (event === 'SIGNED_UP') {
-              await createUserProfile(session.user)
-            } else {
-              // 기존 사용자 로그인 시 프로필 가져오기
-              const userProfile = await fetchUserProfile(session.user.id)
-              setProfile(userProfile)
+            try {
+              // 새 사용자 등록 시 프로필 생성
+              if (event === 'SIGNED_UP') {
+                await createUserProfile(session.user)
+              } else {
+                // 기존 사용자 로그인 시 프로필 가져오기
+                const userProfile = await fetchUserProfile(session.user.id)
+                setProfile(userProfile)
+              }
+            } catch (error) {
+              console.error('프로필 처리 오류:', error)
+              setProfile(null)
             }
           } else {
             // 로그아웃 시 프로필 초기화
             setProfile(null)
           }
 
+          // 프로필 처리 성공/실패와 상관없이 로딩 완료
           setLoading(false)
         }
       }
@@ -183,14 +190,36 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   // 로그아웃
   const signOut = async () => {
     try {
-      const result = await supabase.auth.signOut()
-      // 상태 초기화
+      console.log('🔄 AuthContext: supabase.auth.signOut() 호출 중...')
+
+      // Supabase signOut에 타임아웃 추가 (5초)
+      const signOutPromise = supabase.auth.signOut()
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('signOut timeout after 5 seconds')), 5000)
+      )
+
+      let result
+      try {
+        result = await Promise.race([signOutPromise, timeoutPromise]) as any
+        console.log('✅ AuthContext: supabase.auth.signOut() 완료:', result)
+      } catch (timeoutError) {
+        console.warn('⚠️ AuthContext: signOut 타임아웃, 강제 로그아웃 진행')
+        // 타임아웃이어도 강제로 로그아웃 처리
+        result = { error: null }
+      }
+
+      // 상태 초기화 (타임아웃이어도 실행)
       setUser(null)
       setProfile(null)
       setSession(null)
+      console.log('🧹 AuthContext: 상태 초기화 완료')
       return result
     } catch (error) {
-      console.error('로그아웃 오류:', error)
+      console.error('❌ AuthContext 로그아웃 오류:', error)
+      // 에러가 발생해도 상태 초기화
+      setUser(null)
+      setProfile(null)
+      setSession(null)
       return { error: error as AuthError }
     }
   }

@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
+import { useAuth } from '../contexts/AuthContext'
 import { QuestionService } from '../services/questionService'
 import { ResponseService } from '../services/responseService'
 import { AnswerForm } from '../components/AnswerForm'
 import type { ConnectionStatus, DailySummary } from '../types'
 
 export function HomePage() {
+  const { user } = useAuth()
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('loading')
   const [todayQuestion, setTodayQuestion] = useState<DailySummary | null>(null)
   const [showAnswerForm, setShowAnswerForm] = useState(false)
@@ -49,31 +51,37 @@ export function HomePage() {
   }
 
   useEffect(() => {
-    // 연결 테스트 및 오늘의 질문 로드
+    // 사용자가 로그인되어 있을 때만 질문 로드
+    if (!user) {
+      console.log('⚠️ 사용자가 로그인되지 않았습니다.')
+      return
+    }
+
+    // 오늘의 질문 로드
     const initializeApp = async () => {
       try {
-        // 1. 연결 테스트
-        const isConnected = await QuestionService.testConnection()
+        console.log('🔍 오늘의 질문 가져오는 중...')
 
-        if (!isConnected) {
+        // 사용자 ID를 전달하여 오늘의 질문 가져오기
+        const question = await QuestionService.getTodayQuestion(user.id)
+        console.log('📋 QuestionService 응답:', question)
+
+        if (question) {
+          setTodayQuestion(question)
+          setConnectionStatus('connected')
+          console.log('✅ 질문 로드 성공:', question)
+        } else {
+          console.log('⚠️ 질문이 null입니다.')
           setConnectionStatus('error')
-          return
         }
-
-        // 2. 오늘의 질문 가져오기
-        const question = await QuestionService.getTodayQuestion()
-        setTodayQuestion(question)
-        setConnectionStatus('connected')
-
-        console.log('📋 오늘의 질문:', question)
       } catch (error) {
-        console.error('초기화 중 오류:', error)
+        console.error('❌ 초기화 중 오류:', error)
         setConnectionStatus('error')
       }
     }
 
     initializeApp()
-  }, [])
+  }, [user])
 
   // 답변 저장 핸들러
   const handleSaveAnswer = async (content: string, moodRating?: number) => {

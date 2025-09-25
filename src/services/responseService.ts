@@ -1,8 +1,8 @@
 import { supabase } from '../lib/supabase'
-import type { Response, DailySummary } from '../types'
+import type { Response } from '../lib/supabase'
 
 /**
- * 답변 관리를 위한 서비스
+ * 답변 관리를 위한 서비스 (인증된 사용자 전용)
  */
 export class ResponseService {
   /**
@@ -10,9 +10,14 @@ export class ResponseService {
    */
   static async saveResponse(questionId: string, content: string, moodRating?: number): Promise<Response> {
     try {
-      const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD 형식
+      // 현재 로그인한 사용자 확인
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('로그인이 필요합니다.')
+
+      const today = new Date().toISOString().split('T')[0]
 
       const responseData = {
+        user_id: user.id,
         question_id: questionId,
         content: content.trim(),
         response_date: today,
@@ -48,6 +53,10 @@ export class ResponseService {
    */
   static async updateResponse(responseId: number, content: string, moodRating?: number): Promise<Response> {
     try {
+      // 현재 로그인한 사용자 확인
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('로그인이 필요합니다.')
+
       const responseData = {
         content: content.trim(),
         mood_rating: moodRating || null
@@ -59,6 +68,7 @@ export class ResponseService {
         .from('responses')
         .update(responseData)
         .eq('id', responseId)
+        .eq('user_id', user.id) // 사용자별 데이터 격리
         .select()
         .single()
 
