@@ -18,8 +18,11 @@
 - [`remaining-tasks.md`](./remaining-tasks.md) - 남은 작업 목록 및 우선순위
 
 ### 🤖 MCP 통합
-- [`mcp-integration-guide.md`](./mcp-integration-guide.md) - MCP 서버 통합 가이드
-- [`mcp-developer-reference.md`](./mcp-developer-reference.md) - MCP 개발자 참조 문서
+- [`mcp-integration-guide.md`](./mcp-integration-guide.md) - MCP 서버 통합 가이드 (기본 개념 및 설정)
+- [`mcp-developer-reference.md`](./mcp-developer-reference.md) - MCP 개발자 참조 문서 (명령어 및 API)
+- [`mcp-workflow-examples.md`](./mcp-workflow-examples.md) - 실무 워크플로우 예제집 (시나리오별 가이드)
+- [`mcp-health-check.md`](./mcp-health-check.md) - MCP 헬스 체크 및 모니터링
+- [`mcp-faq-troubleshooting.md`](./mcp-faq-troubleshooting.md) - FAQ 및 트러블슈팅 가이드
 
 ### 📝 기획 및 요구사항
 - [`iwant.md`](./iwant.md) - 프로젝트 초기 요구사항
@@ -29,8 +32,14 @@
 
 ### 새로운 개발자를 위한 필독 문서
 1. [`system-architecture.md`](./system-architecture.md) - 전체 시스템 이해
-2. [`mcp-integration-guide.md`](./mcp-integration-guide.md) - MCP 서버 활용법
-3. [`development-plan.md`](./development-plan.md) - 개발 프로세스 이해
+2. [`mcp-integration-guide.md`](./mcp-integration-guide.md) - MCP 서버 기본 개념 및 설정
+3. [`mcp-workflow-examples.md`](./mcp-workflow-examples.md) - 실무 개발 워크플로우
+4. [`development-plan.md`](./development-plan.md) - 개발 프로세스 및 계획
+
+### 문제 해결이 필요할 때
+1. [`mcp-faq-troubleshooting.md`](./mcp-faq-troubleshooting.md) - 자주 발생하는 문제 해결법
+2. [`mcp-health-check.md`](./mcp-health-check.md) - 시스템 상태 진단 도구
+3. [`mcp-developer-reference.md`](./mcp-developer-reference.md) - 상세 명령어 레퍼런스
 
 ### MCP 서버 활용
 현재 프로젝트에서 사용 중인 MCP 서버들:
