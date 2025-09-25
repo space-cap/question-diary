@@ -8,4 +8,10 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  optimizeDeps: {
+    include: ['@supabase/supabase-js']
+  },
+  define: {
+    global: 'globalThis',
+  },
 })
