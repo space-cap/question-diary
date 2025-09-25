@@ -1,60 +1,18 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-// 타입 정의
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
-
-export interface Database {
-  public: {
-    Tables: {
-      profiles: {
-        Row: {
-          id: string
-          email: string
-          full_name: string | null
-          avatar_url: string | null
-          username: string | null
-          bio: string | null
-          timezone: string
-          language: string
-          theme_preference: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id: string
-          email: string
-          full_name?: string | null
-          avatar_url?: string | null
-          username?: string | null
-          bio?: string | null
-          timezone?: string
-          language?: string
-          theme_preference?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          email?: string
-          full_name?: string | null
-          avatar_url?: string | null
-          username?: string | null
-          bio?: string | null
-          timezone?: string
-          language?: string
-          theme_preference?: string
-          created_at?: string
-          updated_at?: string
-        }
-      }
-    }
-  }
+// 단순화된 타입 정의
+export interface UserProfile {
+  id: string
+  email: string
+  full_name?: string | null
+  avatar_url?: string | null
+  username?: string | null
+  bio?: string | null
+  timezone?: string
+  language?: string
+  theme_preference?: string
+  created_at?: string
+  updated_at?: string
 }
 
 // 환경변수에서 Supabase URL과 익명 키 가져오기
@@ -69,18 +27,8 @@ if (!supabaseAnonKey) {
   throw new Error('VITE_SUPABASE_ANON_KEY가 설정되지 않았습니다.')
 }
 
-// Supabase 클라이언트 생성
-export const supabase = createClient<Database>(
-  supabaseUrl,
-  supabaseAnonKey,
-  {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true
-    }
-  }
-)
+// Supabase 클라이언트 생성 (단순화)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // 개발 모드에서 연결 상태 로깅
 if (import.meta.env.DEV) {

@@ -1,21 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { Session, User, AuthError } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
-
-// 사용자 프로필 타입 정의
-export interface UserProfile {
-  id: string
-  email: string
-  full_name?: string
-  avatar_url?: string
-  username?: string
-  bio?: string
-  timezone: string
-  language: string
-  theme_preference: string
-  created_at: string
-  updated_at: string
-}
+import type { User, AuthError, Session } from '@supabase/supabase-js'
+import { supabase, type UserProfile } from '../lib/supabase'
 
 // AuthContext 타입 정의
 interface AuthContextType {
