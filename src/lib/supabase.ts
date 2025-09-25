@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-// 단순화된 타입 정의
+// 사용자 프로필 타입 정의
 export interface UserProfile {
   id: string
   email: string
@@ -13,6 +13,55 @@ export interface UserProfile {
   theme_preference?: string
   created_at?: string
   updated_at?: string
+}
+
+// 질문 관련 타입 정의
+export interface Question {
+  id: string
+  text: string
+  category?: string | null
+  difficulty?: 'easy' | 'medium' | 'hard'
+  tags?: string[]
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+// 답변 관련 타입 정의
+export interface Response {
+  id: number
+  user_id: string
+  question_id: string
+  content: string
+  mood_rating?: number | null
+  word_count?: number | null
+  response_date: string
+  created_at: string
+  updated_at: string
+}
+
+// 일일 질문 타입 정의
+export interface DailyQuestion {
+  id: number
+  question_id: string
+  assigned_date: string
+  is_completed?: boolean
+  created_at: string
+  question?: Question // 조인된 질문 데이터
+}
+
+// 답변 생성용 타입
+export interface CreateResponseInput {
+  question_id: string
+  content: string
+  mood_rating?: number
+  response_date?: string
+}
+
+// 답변 업데이트용 타입
+export interface UpdateResponseInput {
+  content?: string
+  mood_rating?: number
 }
 
 // 환경변수에서 Supabase URL과 익명 키 가져오기
