@@ -15,6 +15,7 @@
 ### 🔧 개발 및 구현
 - [`development-plan.md`](./development-plan.md) - 개발 계획 및 마일스톤
 - [`implementation-plan.md`](./implementation-plan.md) - 구현 상세 계획
+- [`personal-diary-implementation.md`](./personal-diary-implementation.md) - 개인 로그인 기반 일기 시스템 구현 계획
 - [`remaining-tasks.md`](./remaining-tasks.md) - 남은 작업 목록 및 우선순위
 
 ### 🤖 MCP 통합
